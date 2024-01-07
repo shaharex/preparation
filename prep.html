@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=#, initial-scale=1.0">
+    <title>prep</title>
+    <link rel="stylesheet" href="prep.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gruppo&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="parallax">
+        <p style="padding-top: 18%; padding-left: 30%; font-size: 60px;">Preparation for exams</p>
+    </div>
+    <div>
+        <p style="margin-left: 11%; color: black; font-size: 40px;">Subjects</p>
+    </div>
+
+
+    <div style="display: flex; flex-wrap: wrap; margin-left: 8%;">
+        <div class="container">
+            <img src="mathh.svg" alt="" class="subjects">
+            <button class="button" onclick="scrollToTarget()"></button>
+        </div>
+        <div class="container">
+            <img src="physicss.svg" alt="" class="subjects">
+            <button class="button" onclick="scrollToTarget()"></button>
+        </div>
+        <div class="container">
+            <img src="geogr.svg" alt="" class="subjects">
+            <button class="button" onclick="scrollToTarget()"></button>
+        </div>
+        <div class="container">
+            <img src="chemist.svg" alt="" class="subjects">
+            <button class="button" onclick="scrollToTarget()"></button>
+        </div>
+        <div class="container">
+            <img src="hisisissi.svg" alt="" class="subjects">
+            <button class="button" onclick="scrollToTarget()"></button>
+        </div>
+        <div class="container">
+            <img src="biiooo.svg" alt="" class="subjects">
+            <button class="button" onclick="scrollToTarget()"></button>
+        </div>
+    </div>
+
+    <div id="targetElement">
+        <div id="quiz-container">
+            <button id="start-btn" onclick="startQuiz()">Start Quiz</button>
+            <div id="quiz"></div>
+            <div id="score-container">Score: <span id="score">0</span></div>
+            <button id="finish-btn" onclick="finishQuiz()">Finish</button>
+            <div id="nav-container"></div>
+            <div id="diagram-container">
+                <table id="result-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Your Answer</th>
+                            <th>Correct Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+      
+      <script>
+        function scrollToTarget() {
+          // Scroll to the target element
+          document.getElementById('targetElement').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        const quizData = [
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "Which planet is known as the Red Planet?",
+            options: ["Earth", "Mars", "Venus", "Jupiter"],
+            correctAnswer: "Mars"
+        },
+        {
+            question: "If a square has a side length of 10 units, what is its area?",
+            options: ["50 square units", "100 square units", "150 square units", "200 square units"],
+            correctAnswer:"100 squar units"
+        },
+        {
+            question: "What is the sum of the first 10 positive integers?",
+            options: ["45", "65", "55", "75"],
+            correctAnswer:"75"
+        },
+        {
+            question: "If a square has a side length of 10 units, what is its area?",
+            options: ["50 square units", "100 square units", "150 square units", "200 square units"],
+            correctAnswer:"100 squar units"
+        },
+        {
+            question: "If a square has a side length of 10 units, what is its area?",
+            options: ["50 square units", "100 square units", "150 square units", "200 square units"],
+            correctAnswer:"100 squar units"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        }
+        // Add more questions as needed
+    ];
+
+    let score = 0;
+    let userAnswers = [];
+    let quizStarted = false; // Flag to track whether the quiz has started
+    const quizContainer = document.getElementById("quiz");
+    const scoreContainer = document.getElementById("score");
+    const navContainer = document.getElementById("nav-container");
+    const diagramContainer = document.getElementById("diagram-container");
+    const resultTableBody = document.getElementById("result-table-body");
+    const startButton = document.getElementById("start-btn");
+    const finishButton = document.getElementById("finish-btn");
+
+     // Display questions and options
+     function loadQuestion(index) {
+        const currentQuestion = quizData[index];
+        quizContainer.innerHTML = `
+            <div class="question">${currentQuestion.question}</div>
+            <div class="options">
+                ${currentQuestion.options.map((option, i) => `
+                    <div class="option" onclick="selectOption('${option}', ${index})">${option}</div>
+                `).join('')}
+            </div>
+        `;
+        updateNavButtons(index);
+    }
+
+    // Handle option selection
+    function selectOption(selectedOption, currentIndex) {
+        const currentQuestion = quizData[currentIndex];
+        userAnswers[currentIndex] = selectedOption;
+
+        if (selectedOption === currentQuestion.correctAnswer) {
+            // Increment score for correct answer
+            score++;
+            scoreContainer.innerText = score;
+            console.log('Correct!');
+        } else {
+            // Handle incorrect answer
+            console.log('Incorrect!');
+        }
+
+        // Move to the next question
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < quizData.length) {
+            loadQuestion(nextIndex);
+        } else {
+            finishQuiz();
+        }
+    }
+
+    // Finish the quiz and display the results in a table
+    function finishQuiz() {
+        // Create a table to display the results
+        resultTableBody.innerHTML = '';
+        for (let i = 0; i < quizData.length; i++) {
+            const currentQuestion = quizData[i];
+            const userAnswer = userAnswers[i] || 'Not answered';
+            const isCorrect = userAnswer === currentQuestion.correctAnswer;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${currentQuestion.question}</td>
+                <td>${userAnswer}</td>
+                <td>${currentQuestion.correctAnswer}</td>
+            `;
+            row.style.backgroundColor = isCorrect ? '#c8e6c9' : '#ffcdd2';
+            resultTableBody.appendChild(row);
+        }
+
+        // Hide the quiz content and show the result table
+        quizContainer.style.display = 'none';
+        diagramContainer.style.display = 'block';
+        finishButton.style.display = 'none'; // Hide the finish button after finishing the quiz
+    }
+
+    // Update navigation buttons based on the current question
+    function updateNavButtons(currentIndex) {
+        navContainer.innerHTML = '';
+        for (let i = 0; i < quizData.length; i++) {
+            let navButton = document.createElement('button');
+            navButton.classList.add('nav-button');
+            navButton.innerText = i + 1;
+            navButton.onclick = () => loadQuestion(i);
+            if (i === currentIndex) {
+                navButton.style.backgroundColor = '#6D6D6D  ';
+            }
+            navContainer.appendChild(navButton);
+        }
+    }
+
+    // Start the quiz by loading the first question
+    function startQuiz() {
+        quizStarted = true;
+        loadQuestion(0);
+        startButton.style.display = "none"; // Hide the start button after starting the quiz
+    }
+
+      </script>
+
+</body>
+</html>

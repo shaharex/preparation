@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #quiz-container {
+            width: 100%;
+            position: relative;
+            margin: 0 auto !important;
+            max-width: 1000px;
+            border: 2px #000 solid;
+            padding: 20px 10px 40px 10px;
+            border-radius: 20px;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            width: 784px;
+            height: 77px;
+            font-size: 40px;
+        }
+
+        .options {
+            width: 300px;
+            border-radius: 66px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .option {
+            padding: 10px;
+            cursor: pointer;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #finish-btn {
+            margin-top: 30px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: gray;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #nav-container {
+            border-radius: 35px;
+            margin-top: 60px;
+        }
+
+        .back-off-foo {
+            width: 900px;
+            height: 40px;
+            position: absolute;
+            z-index: -1;
+            background: black;
+        }
+
+        .nav-button {
+            cursor: pointer;
+            width: 90px;
+            height: 40px;
+            color: white;
+            background-color: black;
+            border-color: transparent;
+        }
+
+        #score-container {
+            width: 100px;
+            font-size: 20px;
+            margin-top: -140px;
+            position: absolute;
+            margin-left: 800px;
+        }
+
+        #start-btn {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #diagram-container {
+            display: none; /* Hide the diagram initially */
+            margin-top: 30px;
+        }
+
+        #result-table {
+            margin-top: 30px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #result-table th, #result-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #result-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <title>Quiz App</title>
+</head>
+<body>
+
+<div id="quiz-container">
+    <button id="start-btn" onclick="startQuiz()">Start Quiz</button>
+    <div id="quiz"></div>
+    <div id="score-container">Score: <span id="score">0</span></div>
+    <button id="finish-btn" onclick="finishQuiz()">Finish</button>
+    <div id="nav-container"></div>
+    <div id="diagram-container">
+        <table id="result-table">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Your Answer</th>
+                    <th>Correct Answer</th>
+                </tr>
+            </thead>
+            <tbody id="result-table-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Define your quiz questions and options
+    const quizData = [
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "Which planet is known as the Red Planet?",
+            options: ["Earth", "Mars", "Venus", "Jupiter"],
+            correctAnswer: "Mars"
+        },
+        {
+            question: "If a square has a side length of 10 units, what is its area?",
+            options: ["50 square units", "100 square units", "150 square units", "200 square units"],
+            correctAnswer:"100 squar units"
+        },
+        {
+            question: "What is the sum of the first 10 positive integers?",
+            options: ["45", "65", "55", "75"],
+            correctAnswer:"75"
+        },
+        {
+            question: "If a square has a side length of 10 units, what is its area?",
+            options: ["50 square units", "100 square units", "150 square units", "200 square units"],
+            correctAnswer:"100 squar units"
+        },
+        {
+            question: "If a square has a side length of 10 units, what is its area?",
+            options: ["50 square units", "100 square units", "150 square units", "200 square units"],
+            correctAnswer:"100 squar units"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        },
+        {
+            question: "What is the capital of France?",
+            options: ["Paris", "Berlin", "Madrid", "Rome"],
+            correctAnswer: "Paris"
+        }
+        // Add more questions as needed
+    ];
+
+    let score = 0;
+    let userAnswers = [];
+    let quizStarted = false; // Flag to track whether the quiz has started
+    const quizContainer = document.getElementById("quiz");
+    const scoreContainer = document.getElementById("score");
+    const navContainer = document.getElementById("nav-container");
+    const diagramContainer = document.getElementById("diagram-container");
+    const resultTableBody = document.getElementById("result-table-body");
+    const startButton = document.getElementById("start-btn");
+    const finishButton = document.getElementById("finish-btn");
+
+    // Display questions and options
+    function loadQuestion(index) {
+        const currentQuestion = quizData[index];
+        quizContainer.innerHTML = `
+            <div class="question">${currentQuestion.question}</div>
+            <div class="options">
+                ${currentQuestion.options.map((option, i) => `
+                    <div class="option" onclick="selectOption('${option}', ${index})">${option}</div>
+                `).join('')}
+            </div>
+        `;
+        updateNavButtons(index);
+    }
+
+    // Handle option selection
+    function selectOption(selectedOption, currentIndex) {
+        const currentQuestion = quizData[currentIndex];
+        userAnswers[currentIndex] = selectedOption;
+
+        if (selectedOption === currentQuestion.correctAnswer) {
+            // Increment score for correct answer
+            score++;
+            scoreContainer.innerText = score;
+            console.log('Correct!');
+        } else {
+            // Handle incorrect answer
+            console.log('Incorrect!');
+        }
+
+        // Move to the next question
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < quizData.length) {
+            loadQuestion(nextIndex);
+        } else {
+            finishQuiz();
+        }
+    }
+
+    // Finish the quiz and display the results in a table
+    function finishQuiz() {
+        // Create a table to display the results
+        resultTableBody.innerHTML = '';
+        for (let i = 0; i < quizData.length; i++) {
+            const currentQuestion = quizData[i];
+            const userAnswer = userAnswers[i] || 'Not answered';
+            const isCorrect = userAnswer === currentQuestion.correctAnswer;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${currentQuestion.question}</td>
+                <td>${userAnswer}</td>
+                <td>${currentQuestion.correctAnswer}</td>
+            `;
+            row.style.backgroundColor = isCorrect ? '#c8e6c9' : '#ffcdd2';
+            resultTableBody.appendChild(row);
+        }
+
+        // Hide the quiz content and show the result table
+        quizContainer.style.display = 'none';
+        diagramContainer.style.display = 'block';
+        finishButton.style.display = 'none'; // Hide the finish button after finishing the quiz
+    }
+
+    // Update navigation buttons based on the current question
+    function updateNavButtons(currentIndex) {
+        navContainer.innerHTML = '';
+        for (let i = 0; i < quizData.length; i++) {
+            let navButton = document.createElement('button');
+            navButton.classList.add('nav-button');
+            navButton.innerText = i + 1;
+            navButton.onclick = () => loadQuestion(i);
+            if (i === currentIndex) {
+                navButton.style.backgroundColor = '#6D6D6D  ';
+            }
+            navContainer.appendChild(navButton);
+        }
+    }
+
+    // Start the quiz by loading the first question
+    function startQuiz() {
+        quizStarted = true;
+        loadQuestion(0);
+        startButton.style.display = "none"; // Hide the start button after starting the quiz
+    }
+</script>
+
+</body>
+</html>
